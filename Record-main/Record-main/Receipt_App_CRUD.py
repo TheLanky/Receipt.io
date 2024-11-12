@@ -58,6 +58,7 @@ for receipt in read_receipts():
 # Close the connection
 conn.close()
 """
+"""
 import sqlite3
 
 # Connect to SQLite database
@@ -126,6 +127,99 @@ def delete_receipt(receipt_id):
 def close_connection():
     conn.close()
 
+"""
+import sqlite3
 
+# Connect to SQLite database
+conn = sqlite3.connect('receipts.db')
+c = conn.cursor()
+
+# Create tables for receipts and items, with user_id linking receipts to users
+c.execute('''CREATE TABLE IF NOT EXISTS receipts (
+                id TEXT PRIMARY KEY,
+                user_id INTEGER,
+                vendor TEXT,
+                receipt_date TEXT,
+                total REAL,  -- Total value of the receipt (e.g., before payment)
+                total_amount_given REAL,  -- Amount paid by the user
+                change REAL,
+                payment_method TEXT,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )''')
+
+c.execute('''CREATE TABLE IF NOT EXISTS items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                receipt_id TEXT,
+                item_name TEXT,
+                amount REAL,
+                category TEXT,
+                FOREIGN KEY (receipt_id) REFERENCES receipts(id)
+            )''')
+conn.commit()
+
+# Function to create a new receipt for a specific user
+def create_receipt(user_id, receipt_id, vendor, receipt_date, total, total_amount_given, change, payment_method):
+    c.execute('''INSERT INTO receipts (id, user_id, vendor, receipt_date, total, total_amount_given, change, payment_method)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+              (receipt_id, user_id, vendor, receipt_date, total, total_amount_given, change, payment_method))
+    conn.commit()
+
+# Function to create a new item associated with a receipt
+def create_item(receipt_id, item_name, amount, category):
+    c.execute('''INSERT INTO items (receipt_id, item_name, amount, category)
+                 VALUES (?, ?, ?, ?)''', (receipt_id, item_name, amount, category))
+    conn.commit()
+
+# Function to read all receipts for a specific user
+def read_receipts(user_id):
+    c.execute('SELECT * FROM receipts WHERE user_id = ?', (user_id,))
+    return c.fetchall()
+
+# Function to read items for a given receipt
+def read_items(receipt_id):
+    c.execute('SELECT * FROM items WHERE receipt_id = ?', (receipt_id,))
+    return c.fetchall()
+
+# Function to update a receipt
+def update_receipt(receipt_id, vendor, receipt_date, total_amount_given, change, payment_method, amount, category):
+    c.execute('''UPDATE receipts
+                 SET vendor = ?, receipt_date = ?, total_amount_given = ?, change = ?, payment_method = ?, amount = ?, category = ?
+                 WHERE id = ?''', (vendor, receipt_date, total_amount_given, change, payment_method, amount, category, receipt_id))
+    conn.commit()
+
+# Function to delete a receipt and its associated items
+def delete_receipt(receipt_id):
+    # First, delete items associated with the receipt
+    c.execute('DELETE FROM items WHERE receipt_id = ?', (receipt_id,))
+    # Then, delete the receipt itself
+    c.execute('DELETE FROM receipts WHERE id = ?', (receipt_id,))
+    conn.commit()
+
+# Function to close the connection
+def close_connection():
+    conn.close()
+
+# Example usage
+if __name__ == "__main__":
+    # Assuming a signed-in user with user_id
+    user_id = 1  # Replace with actual user_id after sign-in
+
+    # Create a new receipt for this user
+    create_receipt(user_id, 'receipt123', 'Supermarket', '2024-11-07', 100.0, 10.0, 'Cash', 90.0, 'Groceries')
+
+    # Add items to this receipt
+    create_item('receipt123', 'Apples', 3.0, 'Fruit')
+    create_item('receipt123', 'Milk', 2.0, 'Dairy')
+
+    # Read receipts for this user
+    receipts = read_receipts(user_id)
+    print(receipts)
+
+    # Read items for a specific receipt
+    items = read_items('receipt123')
+    print(items)
+
+    # Close the connection
+    close_connection()
 
 
