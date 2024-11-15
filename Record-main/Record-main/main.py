@@ -76,6 +76,7 @@ if receipt:
             print(f"Item '{item_name}' has been added to the database under receipt ID {receipt_id}.")
 
 # Optional: You can read all receipts and items to check the data in the database
+'''
 print("All Receipts:")
 for receipt in read_receipts(user_id):
     print(receipt)
@@ -83,7 +84,7 @@ for receipt in read_receipts(user_id):
     # Read and print all items for this receipt
     print("Items for this receipt:")
     for item in read_items(receipt[0]):
-        print(item)
+        print(item)'''
 
 # Close the connection when done
 close_connection()

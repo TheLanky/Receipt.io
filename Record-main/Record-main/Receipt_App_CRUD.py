@@ -129,9 +129,11 @@ def close_connection():
 
 """
 import sqlite3
-
+'''
 # Connect to SQLite database
 conn = sqlite3.connect('receipts.db')
+c = conn.cursor()'''
+conn = sqlite3.connect('receipts.db', check_same_thread=False)
 c = conn.cursor()
 
 # Create tables for receipts and items, with user_id linking receipts to users
@@ -173,19 +175,46 @@ def create_item(receipt_id, item_name, amount, category):
 # Function to read all receipts for a specific user
 def read_receipts(user_id):
     c.execute('SELECT * FROM receipts WHERE user_id = ?', (user_id,))
-    return c.fetchall()
+    rows = c.fetchall()
+
+    # Return a list of dictionaries for easier JSON serialization
+    receipts = []
+    for row in rows:
+        receipts.append({
+            "id": row[0],
+            "user_id": row[1],
+            "vendor": row[2],
+            "receipt_date": row[3],
+            "total": row[4],
+            "total_amount_given": row[5],
+            "change": row[6],
+            "payment_method": row[7]
+        })
+    return receipts
 
 # Function to read items for a given receipt
 def read_items(receipt_id):
     c.execute('SELECT * FROM items WHERE receipt_id = ?', (receipt_id,))
-    return c.fetchall()
+    rows = c.fetchall()
 
+    # Return a list of dictionaries for easier JSON serialization
+    items = []
+    for row in rows:
+        items.append({
+            "id": row[0],
+            "receipt_id": row[1],
+            "item_name": row[2],
+            "amount": row[3],
+            "category": row[4]
+        })
+    return items
 # Function to update a receipt
-def update_receipt(receipt_id, vendor, receipt_date, total_amount_given, change, payment_method, amount, category):
+def update_receipt(receipt_id, vendor, receipt_date, total_amount_given, change, payment_method):
     c.execute('''UPDATE receipts
-                 SET vendor = ?, receipt_date = ?, total_amount_given = ?, change = ?, payment_method = ?, amount = ?, category = ?
-                 WHERE id = ?''', (vendor, receipt_date, total_amount_given, change, payment_method, amount, category, receipt_id))
+                 SET vendor = ?, receipt_date = ?, total_amount_given = ?, change = ?, payment_method = ?
+                 WHERE id = ?''', (vendor, receipt_date, total_amount_given, change, payment_method, receipt_id))
     conn.commit()
+
 
 # Function to delete a receipt and its associated items
 def delete_receipt(receipt_id):

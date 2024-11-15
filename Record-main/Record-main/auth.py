@@ -39,7 +39,9 @@ import sqlite3
 import hashlib
 
 # Connect to SQLite database
-conn = sqlite3.connect('receipts.db')
+'''conn = sqlite3.connect('receipts.db')
+c = conn.cursor()'''
+conn = sqlite3.connect('receipts.db', check_same_thread=False)
 c = conn.cursor()
 
 # Create a users table
