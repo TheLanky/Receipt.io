@@ -8,19 +8,28 @@ from auth import sign_in, sign_up
 import uuid
 import re
 def clean_currency(value):
-    try:
-        # Clean the currency by removing any non-numeric characters, keeping only the digits and decimal point
-        return float(str(value).replace(',', '').replace('$', '').strip())
-    except ValueError:
-        return 0.0  # Return 0.0 if there's an error in cleaning
+    """
+    Cleans and converts a value to a float. Handles strings, floats, integers, and None values.
+
+    :param value: The value to clean (string, float, int, or None).
+    :return: A float value.
+    :raises: TypeError if the value is not a supported type.
+    """
+    if value is None:  # Handle None as a special case
+        return 0.0
+    elif isinstance(value, (float, int)):  # Return numeric types as-is
+        return float(value)
+    elif isinstance(value, str):  # Process strings
+        cleaned_value = re.sub(r'[^\d.]+', '', value)  # Remove non-numeric characters except '.'
+        return float(cleaned_value) if cleaned_value else 0.0
+    else:
+        raise TypeError(f"Expected string, float, int, or None, got {type(value)}")
 app = Flask(__name__)
 @app.route('/')
 def home():
     return "Welcome to the Receipt Manager App!"
 
-def clean_currency(value):
-    cleaned_value = re.sub(r'[^\d.]+', '', value)
-    return float(cleaned_value) if cleaned_value else None
+
 
 # Authentication Endpoints
 
@@ -75,6 +84,7 @@ def categorize_and_parse():
         return jsonify({"error": "Parsing failed"}), 400
 @app.route('/receipts', methods=['POST'])
 def create_receipt_with_items():
+
     data = request.json  # Get the incoming JSON data from the request
     user_id = data.get('user_id')  # User ID from the request
     receipt_data = data.get('receipt')  # Receipt data from the request

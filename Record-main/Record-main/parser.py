@@ -35,6 +35,9 @@ def parse_response(response_text):
     # Parse the receipt and items safely
     try:
         receipt = ast.literal_eval(receipt_text)
+        # Check if receipt is a list containing a dictionary and flatten it
+        if isinstance(receipt, list) and len(receipt) == 1 and isinstance(receipt[0], dict):
+            receipt = list(receipt[0].values())  # Flatten to a list of values
         # Insert a unique ID at the start of the receipt list
         receipt.insert(0, str(uuid.uuid4()))  # Add ID as a string
     except Exception as e:
