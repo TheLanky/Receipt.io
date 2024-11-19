@@ -9,15 +9,15 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const initialItems = [
-  { id: 1, name: 'Technician A', quantity: 10 },
-  { id: 2, name: 'Technician B', quantity: 5 },
-  { id: 3, name: 'Technician C', quantity: 8 },
-  { id: 4, name: 'Technician D', quantity: 15 },
-  { id: 5, name: 'Technician E', quantity: 12 },
-  { id: 6, name: 'Technician F', quantity: 9 },
-  { id: 7, name: 'Technician G', quantity: 11 },
-  { id: 8, name: 'Technician H', quantity: 7 },
-  { id: 9, name: 'Technician I', quantity: 14 },
+  { id: 1, name: 'User A', quantity: 10 },
+  { id: 2, name: 'User B', quantity: 5 },
+  { id: 3, name: 'User C', quantity: 8 },
+  { id: 4, name: 'User D', quantity: 15 },
+  { id: 5, name: 'User E', quantity: 12 },
+  { id: 6, name: 'User F', quantity: 9 },
+  { id: 7, name: 'User G', quantity: 11 },
+  { id: 8, name: 'User H', quantity: 7 },
+  { id: 9, name: 'User I', quantity: 14 },
 ];
 
 export default function RemoveItem() {
